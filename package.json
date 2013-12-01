@@ -1,0 +1,35 @@
+{
+  "name": "notobo",
+  "version": "0.0.1",
+  "description": "Converts packages installed by npm into a layout that works best for
+browser-based module loaders.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:requirejs/notobo.git"
+  },
+  "bin": {
+    "notobo": "./bin/notobo"
+  },
+  "keywords": [
+    "AMD",
+    "convert",
+    "packages"
+  ],
+  "author": "James Burke <jrburke@gmail.com> (http://github.com/jrburke)",
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/requirejs/notobo/blob/master/LICENSE"
+    },
+    {
+      "type": "MIT",
+      "url": "https://github.com/requirejs/notobo/blob/master/LICENSE"
+    }
+  ],
+  "dependencies": {
+    "colors": "~0.6.2",
+    "shelljs": "~0.2.6"
+  }
+}
