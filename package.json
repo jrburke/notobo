@@ -1,8 +1,7 @@
 {
   "name": "notobo",
   "version": "0.0.1",
-  "description": "Converts packages installed by npm into a layout that works best for
-browser-based module loaders.",
+  "description": "Converts packages installed by npm into a layout that works best for browser-based module loaders.",
   "main": "index.js",
   "scripts": {},
   "repository": {
