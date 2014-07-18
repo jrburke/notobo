@@ -1,0 +1,15 @@
+{
+  "name": "opaque",
+  "description": "Detect if an image or canvas has any transparent pixels.",
+  "version": "0.0.1",
+  "keywords": [
+    "opacity",
+    "transparent",
+    "browserify",
+    "image"
+  ],
+  "dependencies": {},
+  "scripts": [
+    "index.js"
+  ]
+}

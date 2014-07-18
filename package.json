@@ -1,0 +1,29 @@
+{
+  "name": "notobo",
+  "version": "0.0.0",
+  "description": "Consume npm installed modules in AMD projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec test/walk.js test/convert.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jrburke/notobo.git"
+  },
+  "keywords": [
+    "AMD",
+    "npm",
+    "node_modules"
+  ],
+  "author": "James Burke",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/jrburke/notobo/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.20.1"
+  },
+  "dependencies": {
+    "browserify": "~4.2.1"
+  }
+}

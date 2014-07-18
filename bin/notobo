@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+/*jslint node: true */
+
+var args = [].splice.call(process.argv, 2);
+
+if (args.length !== 2) {
+  console.log('Usage: notobo path/to/node_modules path/to/file/with/amd/config');
+  process.exit(1);
+} else {
+  (require('../index'))(args[0], args[1], function(error) {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  });
+}

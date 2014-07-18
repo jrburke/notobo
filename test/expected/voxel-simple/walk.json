@@ -1,0 +1,342 @@
+{
+  "voxel-hello-world": {
+    "normalizedId": "voxel-hello-world",
+    "main": "index",
+    "deps": {
+      "extend": {
+        "normalizedId": "voxel-hello-world/node_modules/extend",
+        "main": "index"
+      },
+      "voxel": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel",
+        "main": "index",
+        "deps": {
+          "inherits": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel/node_modules/inherits",
+            "main": "inherits"
+          }
+        }
+      },
+      "voxel-engine": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel-engine",
+        "main": "index",
+        "deps": {
+          "aabb-3d": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/aabb-3d",
+            "main": "index"
+          },
+          "collide-3d-tilemap": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/collide-3d-tilemap",
+            "main": "index"
+          },
+          "gl-matrix": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/gl-matrix",
+            "main": "dist/gl-matrix"
+          },
+          "inherits": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/inherits",
+            "main": "inherits"
+          },
+          "interact": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact",
+            "main": "index",
+            "deps": {
+              "drag-stream": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream",
+                "main": "index",
+                "deps": {
+                  "domnode-dom": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom",
+                    "main": "index",
+                    "deps": {
+                      "domnode": {
+                        "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom/node_modules/domnode",
+                        "main": "index",
+                        "deps": {
+                          "mustache": {
+                            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom/node_modules/domnode/node_modules/mustache",
+                            "main": "mustache"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "through": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/through",
+                    "main": "index"
+                  }
+                }
+              },
+              "fullscreen": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/fullscreen",
+                "main": "index"
+              },
+              "pointer-lock": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/interact/node_modules/pointer-lock",
+                "main": "index"
+              }
+            }
+          },
+          "kb-controls": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/kb-controls",
+            "main": "index",
+            "deps": {
+              "ever": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/kb-controls/node_modules/ever",
+                "main": "index"
+              },
+              "vkey": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/kb-controls/node_modules/vkey",
+                "main": "index"
+              }
+            }
+          },
+          "pin-it": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/pin-it",
+            "main": "index"
+          },
+          "raf": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/raf",
+            "main": "index"
+          },
+          "spatial-events": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/spatial-events",
+            "main": "index"
+          },
+          "spatial-trigger": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/spatial-trigger",
+            "main": "index"
+          },
+          "three": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/three",
+            "main": "three"
+          },
+          "tic": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/tic",
+            "main": "index"
+          },
+          "voxel-control": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-control",
+            "main": "index"
+          },
+          "voxel-mesh": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-mesh",
+            "main": "index"
+          },
+          "voxel-physical": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-physical",
+            "main": "index"
+          },
+          "voxel-raycast": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-raycast",
+            "main": "raycast"
+          },
+          "voxel-region-change": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-region-change",
+            "main": "index"
+          },
+          "voxel-texture": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-texture",
+            "main": "index",
+            "deps": {
+              "atlaspack": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-texture/node_modules/atlaspack",
+                "main": "index"
+              }
+            }
+          },
+          "voxel-view": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-engine/node_modules/voxel-view",
+            "main": "index"
+          }
+        }
+      },
+      "voxel-fly": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel-fly",
+        "main": "index",
+        "deps": {
+          "ever": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-fly/node_modules/ever",
+            "main": "index"
+          },
+          "vkey": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-fly/node_modules/vkey",
+            "main": "index"
+          }
+        }
+      },
+      "voxel-highlight": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel-highlight",
+        "main": "index",
+        "deps": {
+          "inherits": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-highlight/node_modules/inherits",
+            "main": "inherits"
+          },
+          "underscore": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-highlight/node_modules/underscore",
+            "main": "underscore"
+          }
+        }
+      },
+      "voxel-player": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel-player",
+        "main": "index",
+        "deps": {
+          "minecraft-skin": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-player/node_modules/minecraft-skin",
+            "main": "index"
+          }
+        }
+      },
+      "voxel-walk": {
+        "normalizedId": "voxel-hello-world/node_modules/voxel-walk",
+        "main": "index",
+        "deps": {
+          "minecraft-skin": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/minecraft-skin",
+            "main": "index"
+          },
+          "painterly-textures": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/painterly-textures",
+            "main": "painterly"
+          },
+          "voxel": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel",
+            "main": "index",
+            "deps": {
+              "inherits": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel/node_modules/inherits",
+                "main": "inherits"
+              }
+            }
+          },
+          "voxel-debris": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-debris",
+            "main": "index",
+            "deps": {
+              "funstance": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-debris/node_modules/funstance",
+                "main": "index"
+              }
+            }
+          },
+          "voxel-engine": {
+            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine",
+            "main": "index",
+            "deps": {
+              "aabb-3d": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/aabb-3d",
+                "main": "index",
+                "deps": {
+                  "gl-matrix": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/aabb-3d/node_modules/gl-matrix",
+                    "main": "dist/gl-matrix"
+                  }
+                }
+              },
+              "collide-3d-tilemap": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/collide-3d-tilemap",
+                "main": "index"
+              },
+              "inherits": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/inherits",
+                "main": "inherits"
+              },
+              "interact": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact",
+                "main": "index",
+                "deps": {
+                  "drag-stream": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream",
+                    "main": "index",
+                    "deps": {
+                      "domnode-dom": {
+                        "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom",
+                        "main": "index",
+                        "deps": {
+                          "domnode": {
+                            "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom/node_modules/domnode",
+                            "main": "index",
+                            "deps": {
+                              "mustache": {
+                                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/domnode-dom/node_modules/domnode/node_modules/mustache",
+                                "main": "mustache"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "through": {
+                        "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/drag-stream/node_modules/through",
+                        "main": "index"
+                      }
+                    }
+                  },
+                  "fullscreen": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/fullscreen",
+                    "main": "index"
+                  },
+                  "pointer-lock": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/interact/node_modules/pointer-lock",
+                    "main": "index"
+                  }
+                }
+              },
+              "player-physics": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/player-physics",
+                "main": "index"
+              },
+              "raf": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/raf",
+                "main": "index"
+              },
+              "spatial-events": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/spatial-events",
+                "main": "index"
+              },
+              "spatial-trigger": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/spatial-trigger",
+                "main": "index"
+              },
+              "three": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/three",
+                "main": "three"
+              },
+              "toolbar": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/toolbar",
+                "main": "index"
+              },
+              "voxel": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel",
+                "main": "index"
+              },
+              "voxel-chunks": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel-chunks",
+                "main": "index"
+              },
+              "voxel-mesh": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel-mesh",
+                "main": "index"
+              },
+              "voxel-region-change": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel-region-change",
+                "main": "index"
+              },
+              "voxel-texture": {
+                "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel-texture",
+                "main": "index",
+                "deps": {
+                  "opaque": {
+                    "normalizedId": "voxel-hello-world/node_modules/voxel-walk/node_modules/voxel-engine/node_modules/voxel-texture/node_modules/opaque",
+                    "main": "index"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
