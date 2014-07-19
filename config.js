@@ -2,20 +2,26 @@
 var fs = require('fs'),
     requirejs = require('./lib/r');
 
+function setDepMap(normalizedId, deps, config) {
+  if (deps) {
+    var modConfig = config.map[normalizedId] = {};
+    Object.keys(deps).forEach(function(depKey) {
+      var depValue = deps[depKey];
+      modConfig[depKey] = depValue.normalizedId;
+      setDepMap(depValue.normalizedId, depValue.deps, config);
+    });
+  }
+}
+
 function setMap(obj, config) {
   Object.keys(obj).forEach(function(key) {
     var value = obj[key];
-    if (value.deps && value.deps.length) {
+    if (value.deps) {
       if (!config.map) {
         config.map = {};
       }
 
-      var modConfig = config.map[value.normalizedId] = {};
-      Object.keys(value.deps).forEach(function(depKey) {
-        var depValue = value.deps[depKey];
-        modConfig[depKey] = depValue.normalizedId;
-        setMap(depValue, config);
-      });
+      setDepMap(value.normalizedId, value.deps, config);
     }
   });
 }
