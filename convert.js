@@ -73,13 +73,16 @@ module.exports = function convert(packageName, mainId, fullPath, baseUrl) {
         nativePath = path.join(baseUrl, nativeId + '.js');
 
     if (!fs.existsSync(nativePath)) {
-      var nativeContents = fs.readFileSync(builtins[nativeId], 'utf8'),
-          converted = toAmd(nativePath, nativeContents);
+      var nativeContents = fs.readFileSync(builtins[nativeId], 'utf8');
 
-      // Write out file if it is different.
-      if (converted.contents !== nativeContents) {
-        fs.writeFileSync(nativePath, converted.contents, 'utf8');
+      // If the native shim is just an empty file, write out an empty AMD
+      // module.
+      if (!nativeContents.trim()) {
+        nativeContents = 'define(function(){});';
       }
+
+      var converted = toAmd(nativePath, nativeContents);
+      fs.writeFileSync(nativePath, converted.contents, 'utf8');
 
       // The builtin adapter could itself have dependencies on other built-ins
       // and if so, make sure to add them.
