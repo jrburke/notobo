@@ -1,6 +1,6 @@
 /*jshint node: true */
 var fs = require('fs'),
-    requirejs = require('./lib/r');
+    requirejs = require('requirejs');
 
 function setDepMap(normalizedId, deps, config) {
   if (deps) {
