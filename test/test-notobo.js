@@ -32,11 +32,15 @@ describe('notobo', function() {
   });
 
   it('nested', function(done) {
+    var configOutput = path.join(dir, 'output', 'nested', 'config.js'),
+        configExpected = path.join(dir, 'expected', 'nested', 'config.js');
+
     notobo(
       path.join(dir, 'output', 'nested', 'node_modules'),
-      path.join(dir, 'output', 'nested', 'config.js'),
+      configOutput,
       function(err) {
-        assert(true, true);
+        assert(file.readFile(configExpected).trim(),
+               file.readFile(configOutput).trim());
         done(err);
       }
     );
