@@ -1,16 +1,20 @@
 /*jshint node: true */
+'use strict';
 
 var fs = require('fs'),
     path = require('path'),
     builtins = require('browserify/lib/builtins'),
-    walk = require('./walk'),
-    nodeModule = require('module'),
     toAmd = require('./lib/toAmd'),
-    nativeModuleCache = {},
     jsSuffixRegExp = /\.js$/;
 
 function isNativeModule(id) {
   return builtins.hasOwnProperty(id);
+}
+
+function findNatives(idArray, dep) {
+  if (isNativeModule(dep) && idArray.indexOf(dep) === -1) {
+    idArray.push(dep);
+  }
 }
 
 function amdDir(dir, foundNatives) {
@@ -87,11 +91,7 @@ module.exports = function convert(packageName, mainId, fullPath, baseUrl) {
       // The builtin adapter could itself have dependencies on other built-ins
       // and if so, make sure to add them.
       if (converted.deps) {
-        converted.deps.forEach(function(dep) {
-          if (isNativeModule(dep) && idArray.indexOf(dep) === -1) {
-            idArray.push(dep);
-          }
-        });
+        converted.deps.forEach(findNatives.bind(null, idArray));
       }
     }
   }

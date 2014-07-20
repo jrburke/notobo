@@ -1,8 +1,9 @@
 /*jshint node: true */
-/*global describe, it, before */
+/*
+'use strict';
 var path = require('path'),
     fs = require('fs'),
-    assert = require("assert"),
+    assert = require('assert'),
     convert = require('../convert'),
     dir = __dirname;
 
@@ -22,3 +23,4 @@ describe('notobo/convert', function() {
   });
 
 });
+*/

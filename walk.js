@@ -1,4 +1,5 @@
 /*jshint node: true */
+'use strict';
 
 var fs = require('fs'),
     path = require('path'),

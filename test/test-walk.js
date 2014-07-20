@@ -1,8 +1,8 @@
 /*jshint node: true */
-/*global describe, it */
+'use strict';
 var path = require('path'),
     fs = require('fs'),
-    assert = require("assert"),
+    assert = require('assert'),
     walk = require('../walk'),
     dir = __dirname;
 
