@@ -4,7 +4,7 @@
   "description": "Consume npm installed modules in AMD projects",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec test/walk.js test/convert.js"
+    "test": "./node_modules/.bin/mocha --reporter spec test/test-walk.js test/test-convert.js test/test-notobo.js"
   },
   "repository": {
     "type": "git",
