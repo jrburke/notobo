@@ -136,6 +136,7 @@ function convertWithFile(baseUrl, file) {
           }
         } else if (nativeStat.isDirectory()) {
           // Copy the directory over
+          file.copyDir(nativePath, destPrefix);
 
           // Walk/convert it.
           nativeWalked[nativeId] = walk.topPackage(nativeId, destPrefix, onDep);
@@ -161,9 +162,9 @@ function convertWithFile(baseUrl, file) {
 }
 
 module.exports = function convert(baseUrl, callback) {
-  onrequirejs(['file'], callback, function(file, callback) {
-    convertWithFile(baseUrl, file);
-    callback();
+  onrequirejs(['env!env/file'], callback, function(file, callback) {
+    var walked = convertWithFile(baseUrl, file);
+    callback(undefined, walked);
   });
 };
 

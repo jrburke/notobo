@@ -2,20 +2,12 @@
 'use strict';
 
 var fs = require('fs'),
-    walk = require('./walk'),
     convert = require('./convert'),
     config = require('./config');
 
 module.exports = function notobo(baseUrl, configFilePath, callback) {
   // For that authentic async callback feel.
   process.nextTick(function() {
-    // data has .main and .deps
-    function onDep(packageName, data, normalizedModuleId, fullPath) {
-      //console.log('onDep called with: ' +
-      //            Array.prototype.slice.call(arguments));
-      convert(packageName, data.main, fullPath, baseUrl);
-    }
-
     try {
       if (!baseUrl) {
         throw new Error('No path for a node_modules was given');
@@ -30,8 +22,13 @@ module.exports = function notobo(baseUrl, configFilePath, callback) {
         throw new Error(configFilePath + ' does not exist');
       }
 
-      var walked  = walk(baseUrl, onDep);
-      config(walked, configFilePath, callback);
+      convert(baseUrl, function(err, walked) {
+        if (err) {
+          callback(err);
+        } else {
+          config(walked, configFilePath, callback);
+        }
+      });
     } catch (e) {
       callback(e);
     }
