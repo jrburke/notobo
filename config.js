@@ -2,7 +2,7 @@
 'use strict';
 
 var fs = require('fs'),
-    requirejs = require('requirejs');
+    onrequirejs = require('./lib/onrequirejs');
 
 function setDepMap(normalizedId, deps, config) {
   if (deps) {
@@ -29,23 +29,13 @@ function setMap(obj, config) {
 }
 
 module.exports = function config(walkData, configFilePath, callback) {
-  // Current r.js is sync for some node compatibility reasons, but for this API,
-  // since it is doing node callbacks, make sure it is async.
-  process.nextTick(function() {
-    requirejs.tools.useLib(function(req) {
-      req(['transform'], function(transform) {
-        try {
-          var contents = fs.readFileSync(configFilePath, 'utf8');
-          contents = transform.modifyConfig(contents, function(currConfig) {
-            setMap(walkData, currConfig);
-            return currConfig;
-          });
-          fs.writeFileSync(configFilePath, contents, 'utf8');
-          callback();
-        } catch (e) {
-          callback(e);
-        }
-      }, callback);
+  onrequirejs(['transform'], callback, function(transform, callback) {
+    var contents = fs.readFileSync(configFilePath, 'utf8');
+    contents = transform.modifyConfig(contents, function(currConfig) {
+      setMap(walkData, currConfig);
+      return currConfig;
     });
+    fs.writeFileSync(configFilePath, contents, 'utf8');
+    callback();
   });
 };
