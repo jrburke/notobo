@@ -114,7 +114,8 @@ function convertWithFile(baseUrl, file) {
 
       // Only do the work if there is not already a module at the expected
       // baseUrl location.
-      if (fs.existsSync(destPrefix + '.js')) {
+      if (!nativeWalked.hasOwnProperty(nativeId) &&
+          !fs.existsSync(destPrefix + '.js')) {
         var nativeStat = fs.statSync(nativePath);
 
         if (nativeStat.isFile()) {
@@ -138,7 +139,9 @@ function convertWithFile(baseUrl, file) {
           // Copy the directory over
           file.copyDir(nativePath, destPrefix);
 
-          // Walk/convert it.
+          // Walk/convert it. Create the entry in nativeWalked before receiving
+          // the walked values to avoid cycles where a native depends on itself.
+          nativeWalked[nativeId] = {};
           nativeWalked[nativeId] = walk.topPackage(nativeId, destPrefix, onDep);
         }
       }
