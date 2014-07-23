@@ -1,7 +1,7 @@
 
 ## notobo
 
-Use modules installed via npm in an AMD module project.
+Use modules installed via npm in an AMD module project. Still in early development.
 
 ## Why
 
