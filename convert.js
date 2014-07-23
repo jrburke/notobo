@@ -87,7 +87,27 @@ function amdDir(dir, foundNatives) {
 
 function convertWithFile(baseUrl, file) {
 
-  function convertPackage(packageName, mainId, fullPath) {
+  // walkData has: packageName, main, normalizedId, fullPath
+  function convertPackage(walkData) {
+    var fullPath = walkData.fullPath,
+        packageName = walkData.packageName,
+        mainId = walkData.main;
+
+    // If fullPath ends in a .js, rename the directory, and adjust the full
+    // path.
+    if (jsSuffixRegExp.test(walkData.fullPath)) {
+      var oldPath = fullPath;
+      fullPath = walkData.fullPath = fullPath.replace(jsSuffixRegExp, '');
+
+      // This could be a re-run, so remove any existing target first.
+      if (fs.existsSync(fullPath)) {
+        file.deleteFile(fullPath);
+      }
+      file.copyDir(oldPath, fullPath);
+      file.deleteFile(oldPath);
+
+    }
+
     // Write main module adapter
     var adapterPath = fullPath + '.js';
 
@@ -148,10 +168,8 @@ function convertWithFile(baseUrl, file) {
     }
   }
 
-  function onDep(packageName, data, normalizedModuleId, fullPath) {
-    //console.log('onDep called with: ' +
-    //            Array.prototype.slice.call(arguments));
-    convertPackage(packageName, data.main, fullPath);
+  function onDep(walkData) {
+    convertPackage(walkData);
   }
 
   var nativeWalked = {};

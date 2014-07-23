@@ -40,27 +40,35 @@ function topPackage(packageName, fullPath, onDep, baseId) {
     mainId = mainId.replace(firstDotRegExp, '').replace(jsSuffixRegExp, '');
 
     // Absolute, normalized module ID depends on nesting level.
-    var normalizeId = baseId ?
+    var normalizedId = (baseId ?
                         baseId + '/node_modules/' + packageName :
-                        packageName;
+                        packageName).replace(jsSuffixRegExp, '');
+
+    var walkData = {
+      packageName: packageName,
+      main: mainId,
+      normalizedId: normalizedId,
+      fullPath: fullPath
+    };
+
+    // Let callback know of new package dependency found. The callback has the
+    // capability to modify the walkData.
+    if (typeof onDep === 'function') {
+      onDep(walkData);
+    }
 
     result = {
-      normalizedId: normalizeId,
-      main: mainId
+      normalizedId: walkData.normalizedId,
+      main: walkData.main
     };
 
     // If the directory has a node_modules, recurse
-    var nodeModulesPath = path.join(fullPath, 'node_modules');
+    var nodeModulesPath = path.join(walkData.fullPath, 'node_modules');
     if (fs.existsSync(nodeModulesPath) &&
         fs.statSync(nodeModulesPath).isDirectory()) {
       result.deps = walk(nodeModulesPath,
                                       onDep,
-                                      normalizeId);
-    }
-
-    // Let callback know of new package dependency found.
-    if (typeof onDep === 'function') {
-      onDep(packageName, result, normalizeId, fullPath);
+                                      walkData.normalizedId);
     }
   }
 
@@ -72,6 +80,8 @@ module.exports = walk = function(dirName, onDep, baseId) {
 
   fs.readdirSync(dirName).forEach(function(packageName) {
     var fullPath = path.join(dirName, packageName);
+
+    packageName = packageName.replace(jsSuffixRegExp, '');
 
     result[packageName] = topPackage(packageName, fullPath, onDep, baseId);
   });
