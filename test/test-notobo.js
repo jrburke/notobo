@@ -25,8 +25,8 @@ describe('notobo', function() {
         configExpected = path.join(dir, 'expected', 'nested', 'config.js');
 
     notobo(
-      path.join(dir, 'output', 'nested', 'node_modules'),
       configOutput,
+      path.join(dir, 'output', 'nested', 'node_modules'),
       function(err) {
         assert(file.readFile(configExpected).trim(),
                file.readFile(configOutput).trim());

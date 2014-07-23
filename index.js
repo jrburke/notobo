@@ -5,12 +5,12 @@ var fs = require('fs'),
     convert = require('./convert'),
     config = require('./config');
 
-module.exports = function notobo(baseUrl, configFilePath, callback) {
+module.exports = function notobo(configFilePath, baseUrl, callback) {
   // For that authentic async callback feel.
   process.nextTick(function() {
     try {
       if (!baseUrl) {
-        throw new Error('No path for a node_modules was given');
+        baseUrl = 'node_modules';
       }
       if (!fs.existsSync(baseUrl)) {
         throw new Error(baseUrl + ' does not exist');

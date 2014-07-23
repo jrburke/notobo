@@ -3,8 +3,8 @@
 
 var args = [].splice.call(process.argv, 2);
 
-if (args.length !== 2) {
-  console.log('Usage: notobo path/to/node_modules path/to/file/with/amd/config');
+if (args.length < 1 || args.length > 3) {
+  console.log('Usage: notobo path/to/file/with/amd/config.js path/to/node_modules');
   process.exit(1);
 } else {
   (require('../index'))(args[0], args[1], function(error) {
