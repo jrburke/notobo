@@ -85,7 +85,11 @@ function amdDir(dir, foundNatives) {
   return foundNatives;
 }
 
-function convertWithFile(baseUrl, file) {
+function convertWithFile(baseUrl, options, file) {
+
+  if (!options.onDep) {
+    options.onDep = onDep;
+  }
 
   // walkData has: packageName, main, normalizedId, fullPath
   function convertPackage(walkData) {
@@ -108,17 +112,19 @@ function convertWithFile(baseUrl, file) {
 
     }
 
-    // Write main module adapter
-    var adapterPath = fullPath + '.js';
+    if (mainId) {
+      // Write main module adapter
+      var adapterPath = fullPath + '.js';
 
-    // This should work multiple times over the same directory. So if the
-    // adapter already exists, do not bother doing the work.
-    if (!fs.existsSync(adapterPath)) {
-      fs.writeFileSync(adapterPath,
-                       'define([\'./' +
-                        packageName + '/' + mainId +
-                        '\'], function(m) { return m; });',
-                       'utf8');
+      // This should work multiple times over the same directory. So if the
+      // adapter already exists, do not bother doing the work.
+      if (!fs.existsSync(adapterPath)) {
+        fs.writeFileSync(adapterPath,
+                         'define([\'./' +
+                          packageName + '/' + mainId +
+                          '\'], function(m) { return m; });',
+                         'utf8');
+      }
     }
 
     // Scan for .js files, and convert to AMD.
@@ -162,7 +168,9 @@ function convertWithFile(baseUrl, file) {
           // Walk/convert it. Create the entry in nativeWalked before receiving
           // the walked values to avoid cycles where a native depends on itself.
           nativeWalked[nativeId] = {};
-          nativeWalked[nativeId] = walk.topPackage(nativeId, destPrefix, onDep);
+          nativeWalked[nativeId] = walk.topPackage(nativeId,
+                                                   destPrefix,
+                                                   options);
         }
       }
     }
@@ -173,7 +181,7 @@ function convertWithFile(baseUrl, file) {
   }
 
   var nativeWalked = {};
-  var walked  = walk(baseUrl, onDep);
+  var walked  = walk(baseUrl, options);
 
   Object.keys(nativeWalked).forEach(function(nativeId) {
     walked[nativeId] = nativeWalked[nativeId];
@@ -182,9 +190,14 @@ function convertWithFile(baseUrl, file) {
   return walked;
 }
 
-module.exports = function convert(baseUrl, callback) {
+module.exports = function convert(baseUrl, options, callback) {
+  if (typeof options === 'function' || !options) {
+    callback = options;
+    options = {};
+  }
+
   onrequirejs(['env!env/file'], callback, function(file, callback) {
-    var walked = convertWithFile(baseUrl, file);
+    var walked = convertWithFile(baseUrl, options, file);
     callback(undefined, walked);
   });
 };

@@ -11,9 +11,13 @@ function throwIfMainJson(filePath) {
   throw new Error('Package at ' + filePath + ' uses .json, not supported yet');
 }
 
-function topPackage(packageName, fullPath, onDep, baseId) {
+function topPackage(packageName, fullPath, options, baseId) {
   var mainId,
       result = {};
+
+  if (!options) {
+    options = {};
+  }
 
   if (fs.statSync(fullPath).isDirectory()) {
     // Read package.json for the main value
@@ -21,6 +25,19 @@ function topPackage(packageName, fullPath, onDep, baseId) {
     if (fs.existsSync(packageJsonPath)) {
       var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
       mainId = packageJson.main;
+    } else if (options.altMainJson) {
+      var altJsonPath = path.join(fullPath, options.altMainJson);
+      if (fs.existsSync(altJsonPath)) {
+        var altJson = JSON.parse(fs.readFileSync(altJsonPath, 'utf8'));
+        if (altJson.main) {
+          // This is likely the bower case. If the mainId is not a .js file, or
+          // just no extension, then disregard.
+          var ext = path.extname(altJson.main);
+          if (!ext || ext === '.js') {
+            mainId = altJson.main;
+          }
+        }
+      }
     }
 
     // Check for index.* conventions
@@ -32,13 +49,6 @@ function topPackage(packageName, fullPath, onDep, baseId) {
       }
     }
 
-    if (!mainId) {
-      throw new Error(fullPath + ' does not have a main module');
-    }
-
-    // Normalize mainId -- do not need the ./ or the file extension
-    mainId = mainId.replace(firstDotRegExp, '').replace(jsSuffixRegExp, '');
-
     // Absolute, normalized module ID depends on nesting level.
     var normalizedId = (baseId ?
                         baseId + '/node_modules/' + packageName :
@@ -46,28 +56,36 @@ function topPackage(packageName, fullPath, onDep, baseId) {
 
     var walkData = {
       packageName: packageName,
-      main: mainId,
       normalizedId: normalizedId,
       fullPath: fullPath
     };
 
+    if (mainId) {
+      // Normalize mainId -- do not need the ./ or the file extension
+      walkData.main = mainId
+                      .replace(firstDotRegExp, '')
+                      .replace(jsSuffixRegExp, '');
+    }
+
     // Let callback know of new package dependency found. The callback has the
     // capability to modify the walkData.
-    if (typeof onDep === 'function') {
-      onDep(walkData);
+    if (typeof options.onDep === 'function') {
+      options.onDep(walkData);
     }
 
     result = {
-      normalizedId: walkData.normalizedId,
-      main: walkData.main
+      normalizedId: walkData.normalizedId
     };
+    if (walkData.main) {
+      result.main = walkData.main;
+    }
 
     // If the directory has a node_modules, recurse
     var nodeModulesPath = path.join(walkData.fullPath, 'node_modules');
     if (fs.existsSync(nodeModulesPath) &&
         fs.statSync(nodeModulesPath).isDirectory()) {
       result.deps = walk(nodeModulesPath,
-                                      onDep,
+                                      options,
                                       walkData.normalizedId);
     }
   }
@@ -75,7 +93,7 @@ function topPackage(packageName, fullPath, onDep, baseId) {
   return result;
 }
 
-module.exports = walk = function(dirName, onDep, baseId) {
+module.exports = walk = function(dirName, options, baseId) {
   var result = {};
 
   fs.readdirSync(dirName).forEach(function(packageName) {
@@ -83,7 +101,7 @@ module.exports = walk = function(dirName, onDep, baseId) {
 
     packageName = packageName.replace(jsSuffixRegExp, '');
 
-    result[packageName] = topPackage(packageName, fullPath, onDep, baseId);
+    result[packageName] = topPackage(packageName, fullPath, options, baseId);
   });
 
   return result;

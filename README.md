@@ -69,6 +69,20 @@ Ideally a front end packager would have these features:
 
 [volo](http://volojs.org/) has those features, uses GitHub as the registry, and is targeted for front end code that is modular. So it may be an alternative approach that may be useful if notobo does not fit your needs.
 
+## Bower option for main module
+
+If you have a listing of bower-installed dependencies, instead of node_modules, then you can use notobo to create main module adapters for the main JS files in the bower packages. If the bower.json "main" entry is not a JS file, no adapter is written.
+
+It will also try to convert CommonJS-style modules to define() wrapped modules, but it does not do anything special for browser-globals based scripts. So, no fancy shim auto configuration with here.
+
+This option should only be used for bower packages that are AMD or CommonJS modules.
+
+Example use:
+
+  notobo --alt-main-json=bower.json path/to/loader/config.js bower_components
+
+If there is a package.json in the directory, notobo will still favor that over the bower.json for finding the "main" module ID.
+
 ## Still TODO
 
 * does not support *.json dependencies

@@ -16,6 +16,18 @@ function compare(testName) {
   });
 }
 
+function compareAltJson(testName, baseDir) {
+  it(testName, function() {
+    var walked = walk(path.join(dir, 'source', testName, baseDir), {
+        altMainJson: 'bower.json'
+    });
+    var expectedPath = path.join(dir, 'expected', testName, 'walk.json');
+    var expected = JSON.parse(fs.readFileSync(expectedPath, 'utf8'));
+    assert.deepEqual(walked, expected);
+  });
+}
+
 describe('notobo/walk', function() {
     compare('voxel-simple');
+    compareAltJson('bower-alt', 'lib');
 });

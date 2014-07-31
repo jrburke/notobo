@@ -16,6 +16,7 @@ function setDepMap(normalizedId, deps, config) {
 }
 
 function setMap(obj, config) {
+  var modified = false;
   Object.keys(obj).forEach(function(key) {
     var value = obj[key];
     if (value.deps) {
@@ -23,17 +24,24 @@ function setMap(obj, config) {
         config.map = {};
       }
 
+      modified = true;
       setDepMap(value.normalizedId, value.deps, config);
     }
   });
+
+  return modified;
 }
 
 module.exports = function config(walkData, configFilePath, callback) {
   onrequirejs(['transform'], callback, function(transform, callback) {
     var contents = fs.readFileSync(configFilePath, 'utf8');
     contents = transform.modifyConfig(contents, function(currConfig) {
-      setMap(walkData, currConfig);
-      return currConfig;
+      // Do not bother returning the config if no changes happened. When no
+      // config is returned, then transform should not attempt a file
+      // modification.
+      if (setMap(walkData, currConfig)) {
+        return currConfig;
+      }
     });
     fs.writeFileSync(configFilePath, contents, 'utf8');
     callback();

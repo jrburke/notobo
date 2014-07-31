@@ -1,6 +1,7 @@
 /*jshint node: true */
 'use strict';
 var file,
+    fs = require('fs'),
     path = require('path'),
     assert = require('assert'),
     requirejs = require('requirejs'),
@@ -13,8 +14,8 @@ describe('notobo', function() {
       req(['env!env/file'], function(f) {
         file = f;
 
-        file.deleteFile('output');
-        file.copyDir('source', 'output');
+        file.deleteFile(path.join(dir, 'output'));
+        file.copyDir(path.join(dir, 'source'), path.join(dir, 'output'));
         done();
       });
     });
@@ -24,14 +25,37 @@ describe('notobo', function() {
     var configOutput = path.join(dir, 'output', 'nested', 'config.js'),
         configExpected = path.join(dir, 'expected', 'nested', 'config.js');
 
-    notobo(
-      configOutput,
-      path.join(dir, 'output', 'nested', 'node_modules'),
-      function(err) {
-        assert(file.readFile(configExpected).trim(),
-               file.readFile(configOutput).trim());
-        done(err);
-      }
-    );
+    notobo({
+      loaderConfigFile: configOutput,
+      baseUrl: path.join(dir, 'output', 'nested', 'node_modules'),
+    },
+    function(err) {
+      assert(file.readFile(configExpected).trim(),
+             file.readFile(configOutput).trim());
+      done(err);
+    });
+  });
+
+  it('bower-alt', function(done) {
+    var configOutput = path.join(dir, 'output', 'bower-alt', 'config.js'),
+        configExpected = path.join(dir, 'expected', 'bower-alt', 'config.js'),
+        altLib = path.join(dir, 'output', 'bower-alt', 'lib');
+
+    notobo({
+      loaderConfigFile: configOutput,
+      baseUrl: altLib,
+      altMainJson: 'bower.json'
+    },
+    function(err) {
+      assert(file.readFile(configExpected).trim(),
+             file.readFile(configOutput).trim());
+
+      assert(true, !fs.existsSync(path.join(altLib, 'two.js')));
+      var adapterPath = path.join(altLib, 'one.js');
+      assert(true, fs.existsSync(adapterPath));
+      assert(true, file.readFile(adapterPath).indexOf('./one/main') !== -1);
+
+      done(err);
+    });
   });
 });

@@ -5,28 +5,31 @@ var fs = require('fs'),
     convert = require('./convert'),
     config = require('./config');
 
-module.exports = function notobo(configFilePath, baseUrl, callback) {
+module.exports = function notobo(options, callback) {
   // For that authentic async callback feel.
   process.nextTick(function() {
     try {
+      var loaderConfigFile = options.loaderConfigFile,
+          baseUrl = options.baseUrl;
+
       if (!baseUrl) {
         baseUrl = 'node_modules';
       }
       if (!fs.existsSync(baseUrl)) {
         throw new Error(baseUrl + ' does not exist');
       }
-      if (!configFilePath) {
+      if (!loaderConfigFile) {
         throw new Error('No path to file that contains the AMD config');
       }
-      if (!fs.existsSync(configFilePath)) {
-        throw new Error(configFilePath + ' does not exist');
+      if (!fs.existsSync(loaderConfigFile)) {
+        throw new Error(loaderConfigFile + ' does not exist');
       }
 
-      convert(baseUrl, function(err, walked) {
+      convert(baseUrl, options, function(err, walked) {
         if (err) {
           callback(err);
         } else {
-          config(walked, configFilePath, callback);
+          config(walked, loaderConfigFile, callback);
         }
       });
     } catch (e) {

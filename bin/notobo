@@ -1,13 +1,40 @@
 #!/usr/bin/env node
 /*jslint node: true */
 
-var args = [].splice.call(process.argv, 2);
+var args = [].splice.call(process.argv, 2),
+    options = {},
+    needHelp = false;
 
-if (args.length < 1 || args.length > 3) {
-  console.log('Usage: notobo path/to/file/with/amd/config.js path/to/node_modules');
+function camelConvert(value) {
+  var parts = value.split('-');
+  for (var i = 1; i < parts.length; i++) {
+    var segment = parts[i];
+    parts[i] = segment.charAt(0).toUpperCase() + segment.substring(1);
+  }
+  return parts.join('');
+}
+
+args.forEach(function(arg) {
+  if (arg.indexOf('--') === 0) {
+    arg = arg.substring(2);
+    var pair = arg.split('=');
+    options[camelConvert(pair[0])] = pair[1] || true;
+  } else {
+    if (!options.hasOwnProperty('loaderConfigFile')) {
+      options.loaderConfigFile = arg;
+    } else if (!options.hasOwnProperty('baseUrl')) {
+      options.baseUrl = arg;
+    } else {
+      needHelp = true;
+    }
+  }
+});
+
+if (!options.hasOwnProperty('loaderConfigFile')) {
+  console.log('Usage: notobo [--alt-main-json=bower.json] path/to/file/with/amd/config.js path/to/node_modules');
   process.exit(1);
 } else {
-  (require('../index'))(args[0], args[1], function(error) {
+  (require('../index'))(options, function(error) {
     if (error) {
       console.error(error);
       process.exit(1);
