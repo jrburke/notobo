@@ -7,11 +7,18 @@ var fs = require('fs'),
     builtins = require('browserify/lib/builtins'),
     walk = require('./walk'),
     toAmd = require('./lib/toAmd'),
+    jsonAdapterPath = require.resolve('./adapters/json'),
+    jsonBuilderAdapterPath = require.resolve('./adapters/json-builder'),
     readableStreamRegExp = /^readable-stream(\/|$)/,
     internalBrowserifyNative = /browserify\/lib$/,
+    jsonPluginRegExp = /^json!/,
     jsSuffixRegExp = /\.js$/;
 
-console.log(JSON.stringify(builtins, null, '  '));
+//console.log(JSON.stringify(builtins, null, '  '));
+
+function isJson(id) {
+  return jsonPluginRegExp.test(id);
+}
 
 function isNativeModule(id) {
   return builtins.hasOwnProperty(id) || readableStreamRegExp.test(id);
@@ -44,14 +51,13 @@ function getNativePath(id) {
 }
 
 function findNatives(idArray, dep) {
-console.log('CHECKING: ' + dep);
   if (isNativeModule(dep) && idArray.indexOf(dep) === -1) {
     idArray.push(dep);
   }
 }
 
-function amdDir(dir, foundNatives) {
-  foundNatives = foundNatives || {};
+function amdDir(dir, traceInfo) {
+  traceInfo = traceInfo || { foundNatives: {}, hasJson: false };
 
   fs.readdirSync(dir).forEach(function(baseName) {
     var fullPath = path.join(dir, baseName),
@@ -67,22 +73,32 @@ function amdDir(dir, foundNatives) {
         fs.writeFileSync(fullPath, converted.contents, 'utf8');
       }
 
-      // Find the native modules needed.
       if (converted.deps) {
         converted.deps.forEach(function(dep) {
+          // Browserify shits in the require API by using numbers sometimes,
+          // so skip those.
+          if (typeof dep !== 'string') {
+            return;
+          }
+
+          // Find the native modules needed.
           if (isNativeModule(dep)) {
-            foundNatives[dep] = true;
+            traceInfo.foundNatives[dep] = true;
+          } else {
+            if (isJson(dep)) {
+              traceInfo.hasJson = true;
+            }
           }
         });
       }
     } else if (stat.isDirectory() && baseName !== 'node_modules') {
       // recurse, but only if not the node_modules, that will be handled
       // by other calls to convert.
-      amdDir(fullPath, foundNatives);
+      amdDir(fullPath, traceInfo);
     }
   });
 
-  return foundNatives;
+  return traceInfo;
 }
 
 function convertWithFile(baseUrl, options, file) {
@@ -128,10 +144,22 @@ function convertWithFile(baseUrl, options, file) {
     }
 
     // Scan for .js files, and convert to AMD.
-    var foundNatives = amdDir(fullPath);
+    var traceInfo = amdDir(fullPath);
+
+    // Install adapter if JSON is used.
+    if (traceInfo.hasJson) {
+      var jsonDest = path.join(baseUrl, 'json.js');
+      if (!fs.existsSync(jsonDest)) {
+        file.copyFile(jsonAdapterPath, jsonDest);
+      }
+      jsonDest = path.join(baseUrl, 'json-builder.js');
+      if (!fs.existsSync(jsonDest)) {
+        file.copyFile(jsonBuilderAdapterPath, jsonDest);
+      }
+    }
 
     // Install adapters for found native node modules.
-    var idArray = Object.keys(foundNatives);
+    var idArray = Object.keys(traceInfo.foundNatives);
 
     for (var i = 0; i < idArray.length; i++) {
       var nativeId = idArray[i],
