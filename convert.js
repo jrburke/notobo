@@ -188,8 +188,8 @@ function convertWithFile(baseUrl, options, file) {
 
         if (converted.deps) {
           converted.deps.forEach(function(dep) {
-            // Browserify shits in the require API by using numbers sometimes,
-            // so skip those.
+            // Browserify throws garbage in the require API by using numbers
+            // sometimes, so skip those.
             if (typeof dep !== 'string') {
               return;
             }

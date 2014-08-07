@@ -37,7 +37,9 @@ The following changes are done to the files in node_modules:
 * For each `packageName` directory, it creates a `packageName.js` file that just depends on the main module in that package.
 * If the `packageName` directory ends in `.js`, then it renames it to not have that extension.
 * It converts all .js files in the `packageName` directory to be an AMD module by wrapping it with `define(function(require, exports, module){})`.
-* If the .js files reference native node modules, notobo copies the browser-friendly packages that [browserify](http://browserify.org/) uses for those modules into the top-most `node_modules` directory. **Note:** there are still a couple of fixes needed to fully support all of those adapter modules. See the [Why](#why) section for details.
+* If the .js files reference native node modules, notobo copies the browser-friendly packages that [browserify](http://browserify.org/) uses for those modules into the top-most `node_modules` directory.
+* If the dependency ends in '.json', then it is converted to a 'json!' dependency, and a json.js and json-builder.js are placed in the node_modules directory, to handle json resources.
+* If a module in the package uses `process` or `Buffer` globals, a `require()` dependency is inserted for those globals. Assumed globals are bad.
 
 The config.js is modified to insert an [AMD map config](https://github.com/amdjs/amdjs-api/blob/master/CommonConfig.md#map-) for the nested node_modules.
 
@@ -51,13 +53,15 @@ Yeah, this points out one of the weaknesses of using npm for front end code. If 
 
 Then it likely does not work in browserify either. Not all npm packages work in the browser, due to behaviors allowed in the node module system that do not work in a networked file system like the browser.
 
-Also, see the [Why](#why) section for some bug fixes still to do for some fixes still to do.
-
 If you just distribute front end code that is already known to work as an AMD module, that will work fine. Or, if the module is a fairly straigtforward node module that does not use any of the native node modules, it should work too.
+
+If there is an npm package that you would like to see working, feel free to [create an issue](https://github.com/jrburke/notobo/issues) describing the module and a test case that shows how it breaks.
 
 ### Are you suggesting putting AMD modules in npm?
 
-The npm folks have said it is fine to put in front end code in npm. Others have put browser globals-based code in there. So yes. npm is just about distributing packages of code that are laid out in a node_modules nested fashion and uses package.json for declaring a 'main' and 'dependencies'.
+The npm folks have said it is fine to put in front end code in npm. Others have put browser globals-based code in there. So yes, it is fine.
+
+npm is just about distributing packages of code that are laid out in a node_modules nested fashion and uses package.json for declaring a 'main' and 'dependencies'.
 
 ## Philosophical stuff
 
@@ -85,10 +89,11 @@ If there is a package.json in the directory, notobo will still favor that over t
 
 ## Still TODO
 
-* does not support *.json dependencies
-* need to handle _stream_duplex, etc builtins?
-* expand support for "browser" package.json alt modules. Only "main" use supported right now.
-* test for natives mapped to empty in browserify
+* sample starter project
+* decision tree
+* expand support for the "browser" property in package.json for alt modules. Only "main" use supported right now.
+* test for natives mapped to empty in browserify.
+* right now only dependencies that explicitly end in '.json' are found and converted to 'json!' dependencies. Need to find out if it is common to use the assumed '.json' file scanning and not include the '.json' extension.
 
 ### Less important TODOs
 
