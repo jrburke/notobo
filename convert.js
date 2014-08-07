@@ -12,10 +12,15 @@ var fs = require('fs'),
     browserifyPath = path.dirname(require.resolve('browserify')),
     browserifyPackageDir = path.join(browserifyPath, 'node_modules'),
     internalBrowserifyNative = /browserify\/lib$/,
+    readableStreamDepRegExp = /require\s*\(\s*["']readable-stream[^\)]*\)/g,
+    streamRegExp = /(require\s*\(\s*["'])stream(["']\s*\))/g,
     jsonPluginRegExp = /^json!/,
     jsSuffixRegExp = /\.js$/;
 
 //console.log(JSON.stringify(builtins, null, '  '));
+
+var streamMainAdapter = 'define([\'./stream/browser-main\'], ' +
+                        'function(m) { return m; });';
 
 function getPackageJson(filePath) {
   if (fs.existsSync(filePath)) {
@@ -104,6 +109,34 @@ function convertWithFile(baseUrl, options, file) {
         nativeWalked[nativeId] = walk.topPackage(nativeId,
                                                  destPrefix,
                                                  options);
+
+        // Need to fix up the stream-browserify and readable-stream relations.
+        if (nativeId === 'stream') {
+          var mainPath = path.join(destPrefix,
+                                   nativeWalked[nativeId].main + '.js');
+          if (fs.existsSync(mainPath)) {
+            var mainContents = file.readFile(mainPath)
+                               .replace(readableStreamDepRegExp, 'undefined');
+            file.saveFile(mainPath, mainContents);
+            file.copyFile(path.join(__dirname,
+                                    'adapters', 'stream-browser-main.js'),
+                          path.join(destPrefix, 'browser-main.js'));
+            file.saveFile(destPrefix + '.js', streamMainAdapter);
+          }
+        } else if (nativeId === 'readable-stream') {
+          var files = file.getFilteredFileList(destPrefix, jsSuffixRegExp);
+          files.forEach(function(filePath) {
+            var fileContents = file.readFile(filePath);
+
+            fileContents = fileContents.replace(streamRegExp,
+            function(match, prefix, suffix) {
+              return prefix + 'stream/index' + suffix;
+            });
+
+            file.saveFile(filePath, fileContents);
+          });
+        }
+
 
         // Some of the native shims depend on packages installed in browserify's
         // node_modules. So if a package.json dependency is not in the nested
