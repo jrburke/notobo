@@ -7,11 +7,6 @@ Use modules installed via npm in an AMD module project. Still in early developme
 
 Some people want to use npm to pull in dependencies for front end code, and then use a module system that allows dynamic module loading, and other features of an AMD module system, like loader plugins.
 
-Right now it is best to use this for npm packages that do not use the standard native node modules (like 'fs', 'http'). This is a temporary restriction. It almost works now, but the following fixes need to be done first:
-
-* use a 'json!' loader plugin for modules that use the implicit '.json' support in the node module lookup system.
-* The readable-stream adaptation needs a bit more work.
-
 ## How it works
 
 For now, you can look at [test/source/nested](https://github.com/jrburke/notobo/tree/master/test/source/nested) to see the basic setup:
