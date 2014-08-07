@@ -35,10 +35,14 @@ function isJson(id) {
 }
 
 function isNativeModule(id) {
-  return builtins.hasOwnProperty(id);
+  return builtins.hasOwnProperty(id) || id === 'process';
 }
 
 function getNativePath(id) {
+  if (id === 'process') {
+    id = '_' + id;
+  }
+
   var nativePath = builtins[id];
 
   if (!nativePath) {
@@ -132,6 +136,14 @@ function convertWithFile(baseUrl, options, file) {
             function(match, prefix, suffix) {
               return prefix + 'stream/index' + suffix;
             });
+
+            if (/_stream_writable.js$/.test(filePath)) {
+              // It is a complicated web that we weave for backcompat
+              fileContents = fileContents.replace(
+                /require\('.\/_stream_duplex'\)/g,
+                'require(\'./_stream\' + \'_duplex\')'
+              );
+            }
 
             file.saveFile(filePath, fileContents);
           });

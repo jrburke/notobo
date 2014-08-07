@@ -87,6 +87,7 @@ If there is a package.json in the directory, notobo will still favor that over t
 
 * does not support *.json dependencies
 * need to handle _stream_duplex, etc builtins?
+* expand support for "browser" package.json alt modules. Only "main" use supported right now.
 * test for natives mapped to empty in browserify
 
 ### Less important TODOs
