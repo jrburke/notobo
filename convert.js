@@ -9,32 +9,35 @@ var fs = require('fs'),
     toAmd = require('./lib/toAmd'),
     jsonAdapterPath = require.resolve('./adapters/json'),
     jsonBuilderAdapterPath = require.resolve('./adapters/json-builder'),
-    readableStreamRegExp = /^readable-stream(\/|$)/,
+    browserifyPath = path.dirname(require.resolve('browserify')),
+    browserifyPackageDir = path.join(browserifyPath, 'node_modules'),
     internalBrowserifyNative = /browserify\/lib$/,
     jsonPluginRegExp = /^json!/,
     jsSuffixRegExp = /\.js$/;
 
 //console.log(JSON.stringify(builtins, null, '  '));
 
+function getPackageJson(filePath) {
+  if (fs.existsSync(filePath)) {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } else {
+    return {};
+  }
+}
+
 function isJson(id) {
   return jsonPluginRegExp.test(id);
 }
 
 function isNativeModule(id) {
-  return builtins.hasOwnProperty(id) || readableStreamRegExp.test(id);
+  return builtins.hasOwnProperty(id);
 }
 
 function getNativePath(id) {
   var nativePath = builtins[id];
 
   if (!nativePath) {
-    if (readableStreamRegExp.test(id)) {
-      // Just pick a readable-stream entry, will need the whole directory
-      // anyway.
-      nativePath = builtins._stream_readable;
-    } else {
-      throw new Error('Unknown native ID: ' + id);
-    }
+    throw new Error('Unknown native ID: ' + id);
   }
 
   // Have a path to a specific module, but really need the full package
@@ -50,61 +53,126 @@ function getNativePath(id) {
   }
 }
 
-function findNatives(idArray, dep) {
-  if (isNativeModule(dep) && idArray.indexOf(dep) === -1) {
-    idArray.push(dep);
-  }
-}
-
-function amdDir(dir, traceInfo) {
-  traceInfo = traceInfo || { foundNatives: {}, hasJson: false };
-
-  fs.readdirSync(dir).forEach(function(baseName) {
-    var fullPath = path.join(dir, baseName),
-        stat = fs.statSync(fullPath);
-
-    if (jsSuffixRegExp.test(baseName) && stat.isFile()) {
-      var contents = fs.readFileSync(fullPath, 'utf8');
-      // converted has .contents and .deps array.
-      var converted = toAmd(fullPath, contents);
-
-      // Write out file if it is different.
-      if (converted.contents !== contents) {
-        fs.writeFileSync(fullPath, converted.contents, 'utf8');
-      }
-
-      if (converted.deps) {
-        converted.deps.forEach(function(dep) {
-          // Browserify shits in the require API by using numbers sometimes,
-          // so skip those.
-          if (typeof dep !== 'string') {
-            return;
-          }
-
-          // Find the native modules needed.
-          if (isNativeModule(dep)) {
-            traceInfo.foundNatives[dep] = true;
-          } else {
-            if (isJson(dep)) {
-              traceInfo.hasJson = true;
-            }
-          }
-        });
-      }
-    } else if (stat.isDirectory() && baseName !== 'node_modules') {
-      // recurse, but only if not the node_modules, that will be handled
-      // by other calls to convert.
-      amdDir(fullPath, traceInfo);
-    }
-  });
-
-  return traceInfo;
-}
-
 function convertWithFile(baseUrl, options, file) {
-
   if (!options.onDep) {
     options.onDep = onDep;
+  }
+
+  var nativeWalked = {};
+
+  function installNativeShim(nativeId, nativePath) {
+    nativePath = nativePath || getNativePath(nativeId);
+
+    var destPrefix = path.join(baseUrl, nativeId);
+
+    // Only do the work if there is not already a module at the expected
+    // baseUrl location.
+    if (!nativeWalked.hasOwnProperty(nativeId) &&
+        !fs.existsSync(destPrefix + '.js')) {
+      var nativeStat = fs.statSync(nativePath);
+
+      if (nativeStat.isFile()) {
+        var nativeContents = fs.readFileSync(builtins[nativeId], 'utf8');
+
+        // If the native shim is just an empty file, write out an empty AMD
+        // module.
+        if (!nativeContents.trim()) {
+          nativeContents = 'define(function(){});';
+        }
+
+        var converted = toAmd(nativePath, nativeContents);
+        fs.writeFileSync(nativePath, converted.contents, 'utf8');
+
+        nativeWalked[nativeId] = {};
+
+        // The builtin adapter could itself have dependencies on other
+        // built-ins and if so, make sure to add them.
+        if (converted.deps) {
+          converted.deps.forEach(function(dep) {
+            if (isNativeModule(dep) && !nativeWalked.hasOwnProperty(dep)) {
+              installNativeShim(dep);
+            }
+          });
+        }
+      } else if (nativeStat.isDirectory()) {
+        // Copy the directory over.
+        file.copyDir(nativePath, destPrefix);
+
+        // Walk/convert it. Create the entry in nativeWalked before receiving
+        // the walked values to avoid cycles where a native depends on itself.
+        nativeWalked[nativeId] = {};
+        nativeWalked[nativeId] = walk.topPackage(nativeId,
+                                                 destPrefix,
+                                                 options);
+
+        // Some of the native shims depend on packages installed in browserify's
+        // node_modules. So if a package.json dependency is not in the nested
+        // node_modules for that shim, get it from the browserify node_modules.
+        var nativePackageJsonPath = path.join(destPrefix, 'package.json');
+        var deps = getPackageJson(nativePackageJsonPath).dependencies;
+        if (deps) {
+          Object.keys(deps).forEach(function(depName) {
+            var nestedPath = path.join(destPrefix, 'node_modules', depName);
+            if (!fs.existsSync(nestedPath)) {
+              var altPath = path.join(browserifyPackageDir, depName);
+              if (!nativeWalked.hasOwnProperty(depName) &&
+                  fs.existsSync(altPath)) {
+                installNativeShim(depName, altPath);
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
+  function amdDir(dir) {
+    fs.readdirSync(dir).forEach(function(baseName) {
+      var fullPath = path.join(dir, baseName),
+          stat = fs.statSync(fullPath);
+
+      if (jsSuffixRegExp.test(baseName) && stat.isFile()) {
+        var contents = fs.readFileSync(fullPath, 'utf8');
+        // converted has .contents and .deps array.
+        var converted = toAmd(fullPath, contents);
+
+        // Write out file if it is different.
+        if (converted.contents !== contents) {
+          fs.writeFileSync(fullPath, converted.contents, 'utf8');
+        }
+
+        if (converted.deps) {
+          converted.deps.forEach(function(dep) {
+            // Browserify shits in the require API by using numbers sometimes,
+            // so skip those.
+            if (typeof dep !== 'string') {
+              return;
+            }
+
+            // Find the native modules needed.
+            if (isNativeModule(dep) && !nativeWalked.hasOwnProperty(dep)) {
+              installNativeShim(dep);
+            } else {
+              if (isJson(dep)) {
+                // Write out json plugin and its builder.
+                var jsonDest = path.join(baseUrl, 'json.js');
+                if (!fs.existsSync(jsonDest)) {
+                  file.copyFile(jsonAdapterPath, jsonDest);
+                }
+                jsonDest = path.join(baseUrl, 'json-builder.js');
+                if (!fs.existsSync(jsonDest)) {
+                  file.copyFile(jsonBuilderAdapterPath, jsonDest);
+                }
+              }
+            }
+          });
+        }
+      } else if (stat.isDirectory() && baseName !== 'node_modules') {
+        // recurse, but only if not the node_modules, that will be handled
+        // by other calls to convert.
+        amdDir(fullPath);
+      }
+    });
   }
 
   // walkData has: packageName, main, normalizedId, fullPath
@@ -144,72 +212,14 @@ function convertWithFile(baseUrl, options, file) {
     }
 
     // Scan for .js files, and convert to AMD.
-    var traceInfo = amdDir(fullPath);
-
-    // Install adapter if JSON is used.
-    if (traceInfo.hasJson) {
-      var jsonDest = path.join(baseUrl, 'json.js');
-      if (!fs.existsSync(jsonDest)) {
-        file.copyFile(jsonAdapterPath, jsonDest);
-      }
-      jsonDest = path.join(baseUrl, 'json-builder.js');
-      if (!fs.existsSync(jsonDest)) {
-        file.copyFile(jsonBuilderAdapterPath, jsonDest);
-      }
-    }
-
-    // Install adapters for found native node modules.
-    var idArray = Object.keys(traceInfo.foundNatives);
-
-    for (var i = 0; i < idArray.length; i++) {
-      var nativeId = idArray[i],
-          nativePath = getNativePath(nativeId),
-          destPrefix = path.join(baseUrl, nativeId);
-
-      // Only do the work if there is not already a module at the expected
-      // baseUrl location.
-      if (!nativeWalked.hasOwnProperty(nativeId) &&
-          !fs.existsSync(destPrefix + '.js')) {
-        var nativeStat = fs.statSync(nativePath);
-
-        if (nativeStat.isFile()) {
-          var nativeContents = fs.readFileSync(builtins[nativeId], 'utf8');
-
-          // If the native shim is just an empty file, write out an empty AMD
-          // module.
-          if (!nativeContents.trim()) {
-            nativeContents = 'define(function(){});';
-          }
-
-          var converted = toAmd(nativePath, nativeContents);
-          fs.writeFileSync(nativePath, converted.contents, 'utf8');
-
-          // The builtin adapter could itself have dependencies on other
-          // built-ins and if so, make sure to add them.
-          if (converted.deps) {
-            converted.deps.forEach(findNatives.bind(null, idArray));
-          }
-        } else if (nativeStat.isDirectory()) {
-          // Copy the directory over
-          file.copyDir(nativePath, destPrefix);
-
-          // Walk/convert it. Create the entry in nativeWalked before receiving
-          // the walked values to avoid cycles where a native depends on itself.
-          nativeWalked[nativeId] = {};
-          nativeWalked[nativeId] = walk.topPackage(nativeId,
-                                                   destPrefix,
-                                                   options);
-        }
-      }
-    }
+    amdDir(fullPath);
   }
 
   function onDep(walkData) {
     convertPackage(walkData);
   }
 
-  var nativeWalked = {};
-  var walked  = walk(baseUrl, options);
+  var walked = walk(baseUrl, options);
 
   Object.keys(nativeWalked).forEach(function(nativeId) {
     walked[nativeId] = nativeWalked[nativeId];
@@ -229,8 +239,3 @@ module.exports = function convert(baseUrl, options, callback) {
     callback(undefined, walked);
   });
 };
-
-
-
-
-

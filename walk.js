@@ -24,7 +24,10 @@ function topPackage(packageName, fullPath, options, baseId) {
     var packageJsonPath = path.join(fullPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
       var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      mainId = packageJson.main;
+      // Some modules use packageJson.browser to indicate a browser alternative
+      // for a main module. The 'inherits' package is one example.
+      mainId = typeof packageJson.browser === 'string' ?
+               packageJson.browser : packageJson.main;
     } else if (options.altMainJson) {
       var altJsonPath = path.join(fullPath, options.altMainJson);
       if (fs.existsSync(altJsonPath)) {
