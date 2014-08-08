@@ -3,6 +3,9 @@
   "version": "0.0.3",
   "description": "Use modules installed via npm in an AMD module project",
   "main": "index.js",
+  "bin": {
+    "notobo": "./bin/notobo"
+  },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec test/test-walk.js test/test-convert.js test/test-notobo.js"
   },

@@ -31,7 +31,7 @@ args.forEach(function(arg) {
 });
 
 if (!options.hasOwnProperty('loaderConfigFile')) {
-  console.log('Usage: notobo [--alt-main-json=bower.json] path/to/file/with/amd/config.js path/to/node_modules');
+  console.log('Usage: notobo [--alt-main-json=bower.json] path/to/file/with/amd/config.js [path/to/node_modules]');
   process.exit(1);
 } else {
   (require('../index'))(options, function(error) {

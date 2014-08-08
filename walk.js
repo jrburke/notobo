@@ -15,6 +15,12 @@ function topPackage(packageName, fullPath, options, baseId) {
   var mainId,
       result = {};
 
+  // Do not bother with requirejs, it is a bootstrap package. Also, no need to
+  // handle the .bin directory.
+  if (packageName === 'requirejs' || packageName === '.bin') {
+    return result;
+  }
+
   if (!options) {
     options = {};
   }
