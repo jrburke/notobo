@@ -29,7 +29,7 @@ Once you install notobo, you can use [an example project](https://github.com/jrb
 
     notobo config.js
 
-5) notobo will modify the node_modules directory and config.js to conform to an AMD loader expectations.
+5) notobo will modify the node_modules directory and config.js to conform to an AMD loader's expectations.
 
 ## Description of modifications
 
