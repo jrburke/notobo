@@ -1,5 +1,9 @@
 # npm sharp edges
 
+* default to install all at node_modules root unless a conflict
+* an npm flat instead of npm dedupe?
+* Problems exist for any module system that allows loading individual modules. Will happen ES modules, and if a CJS loader were to run.
+
 This is a list of sharp edges that come with using npm for front end code. If you know of existing bug numbers for some of these that are filed and in progress for npm, feel free to let me know and I can add links to them in the sections below.
 
 ### Nested node_modules

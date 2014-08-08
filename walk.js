@@ -12,7 +12,7 @@ function throwIfMainJson(filePath) {
 }
 
 function topPackage(packageName, fullPath, options, baseId) {
-  var mainId,
+  var mainId, packageJson,
       result = {};
 
   // Do not bother with requirejs, it is a bootstrap package. Also, no need to
@@ -29,7 +29,7 @@ function topPackage(packageName, fullPath, options, baseId) {
     // Read package.json for the main value
     var packageJsonPath = path.join(fullPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
-      var packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
       // Some modules use packageJson.browser to indicate a browser alternative
       // for a main module. The 'inherits' package is one example.
       mainId = typeof packageJson.browser === 'string' ?
@@ -96,6 +96,43 @@ function topPackage(packageName, fullPath, options, baseId) {
       result.deps = walk(nodeModulesPath,
                                       options,
                                       walkData.normalizedId);
+    }
+
+    // If the package.json has a browser field that is an object of alternatives
+    // set up map config for them.
+    var browserAlts = packageJson && packageJson.browser;
+    if (browserAlts && typeof browserAlts !== 'string') {
+      if (!result.deps) {
+        result.deps = {};
+      }
+
+      Object.keys(browserAlts).forEach(function(targetId) {
+        var altId = browserAlts[targetId];
+
+        if (targetId.indexOf('.') === 0) {
+          targetId = walkData.normalizedId + '/' + targetId.substring(2);
+        }
+        targetId = targetId.replace(jsSuffixRegExp, '');
+
+        if (altId === false) {
+          result.deps[targetId] = 'notobo-empty';
+        } else {
+          altId = altId.replace(jsSuffixRegExp, '');
+
+          if (altId.indexOf('.') === 0) {
+            altId = walkData.normalizedId + altId.substring(2);
+          } else {
+            // Find out if the referenced ID is in nested node_modules, and
+            // if so, append node_modules to the final ID.
+            var firstPart = altId.split('/').shift();
+            if (fs.existsSync(path.join(nodeModulesPath, firstPart))) {
+              altId = walkData.normalizedId + '/node_modules/' + altId;
+            }
+          }
+
+          result.deps[targetId] = altId;
+        }
+      });
     }
   }
 
