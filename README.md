@@ -1,5 +1,5 @@
 
-## notobo
+# notobo
 
 Use modules installed via npm in AMD module projects, like projects that use [RequireJS](http://requirejs.org/).
 
@@ -15,7 +15,7 @@ For front end npm use, it also may give some feedback on how npm could be more u
 
 You can look at [test/source/nested](https://github.com/jrburke/notobo/tree/master/test/source/nested) to see the basic setup.
 
-Once you install notobo, you can use [an example project](https://github.com/jrburke/notobo-example) to get started, and highlights some benefits of a front end module loader.
+Once you install notobo, you can use [an example project](https://github.com/jrburke/notobo-example) to get started. That example project highlights some benefits of a front end module loader.
 
 1) Install notobo. It is a command line utility that runs in Node, so install it with the -g flag:
 
@@ -54,7 +54,7 @@ Yeah, this points out one of the weaknesses of using npm for front end code. If 
 
 ### Package X doesn't work!
 
-Then it likely does not work in browserify either. Not all npm packages work in the browser, due to behaviors allowed in the Node module system that do not work in a networked file system like the browser.
+There is a good chance it does not work in browserify either. Not all npm packages work in the browser, due to behaviors allowed in the Node module system that do not work in a networked file system like the browser.
 
 If it is something that plugs in to Node's Module._extensions, like transpilers (CoffeeScript for example), then it is guaranteed not to work. The solution for front end code is to use [loader plugins](https://github.com/jrburke/requirejs/wiki/Plugins) for transpiled resources. They create a clear ownership/dependency chain that works for a network IO environment.
 
@@ -70,7 +70,7 @@ See the [issues](https://github.com/jrburke/notobo/issues) or the [todo doc](htt
 
 The npm folks have said it is fine to put in front end code in npm. Others have put browser globals-based code in there. So yes, it is fine.
 
-npm is just about distributing packages of code that are laid out in a node_modules nested fashion and uses package.json for declaring a 'main' and 'dependencies'.
+npm is just about distributing packages of code that are installed in a node_modules nested fashion and uses package.json for declaring a 'main' and 'dependencies'.
 
 The decision of what package manager to use is separate than the module format used at runtime for the modules. Choose the module format for those runtime concerns.
 
@@ -84,7 +84,7 @@ The [npm sharp edges doc](https://github.com/jrburke/notobo/blob/master/docs/npm
 
 ## Bower option for main module
 
-If you have a listing of bower-installed dependencies, instead of node_modules, then you can use notobo to create main module adapters for the main JS files in the bower packages. If the bower.json "main" entry is not a JS file, no adapter is written.
+If you have bower-installed dependencies, instead of node_modules, then you can use notobo to create main module adapters for the main JS files in the bower packages. If the bower.json "main" entry is not a JS file, no adapter is written.
 
 It will also try to convert CommonJS-style modules to `define()`-wrapped modules, but it does not do anything special for browser-globals based scripts.
 
