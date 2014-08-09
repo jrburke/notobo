@@ -1,1 +1,47 @@
-{}
+{
+  "hasfalse": {
+    "normalizedId": "hasfalse",
+    "main": "index",
+    "map": {
+      "imaginary": "notobo-empty"
+    }
+  },
+  "haslocal": {
+    "normalizedId": "haslocal",
+    "main": "index",
+    "map": {
+      "haslocal/sub": "haslocal/browser/sub"
+    }
+  },
+  "hasmain": {
+    "normalizedId": "hasmain",
+    "main": "browser-index"
+  },
+  "hastop": {
+    "normalizedId": "hastop",
+    "main": "index",
+    "map": {
+      "colors": "hastop/node_modules/colors-browser",
+      "node-shapes": "shapes"
+    },
+    "deps": {
+      "colors-browser": {
+        "normalizedId": "hastop/node_modules/colors-browser",
+        "main": "index",
+        "map": {
+          "hex": "hastop/node_modules/colors-browser/node_modules/hex-browser"
+        },
+        "deps": {
+          "hex-browser": {
+            "normalizedId": "hastop/node_modules/colors-browser/node_modules/hex-browser",
+            "main": "index"
+          }
+        }
+      }
+    }
+  },
+  "shapes": {
+    "normalizedId": "shapes",
+    "main": "index"
+  }
+}

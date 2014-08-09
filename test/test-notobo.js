@@ -21,20 +21,24 @@ describe('notobo', function() {
     });
   });
 
-  it('nested', function(done) {
-    var configOutput = path.join(dir, 'output', 'nested', 'config.js'),
-        configExpected = path.join(dir, 'expected', 'nested', 'config.js');
+  function compareConfig(testName, done) {
+    it(testName, function(done) {
+      var configOutput = path.join(dir, 'output', testName, 'config.js'),
+          configExpected = path.join(dir, 'expected', testName, 'config.js');
 
-    notobo({
-      loaderConfigFile: configOutput,
-      baseUrl: path.join(dir, 'output', 'nested', 'node_modules'),
-    },
-    function(err) {
-      assert(file.readFile(configExpected).trim(),
-             file.readFile(configOutput).trim());
-      done(err);
+      notobo({
+        loaderConfigFile: configOutput,
+        baseUrl: path.join(dir, 'output', testName, 'node_modules'),
+      },
+      function(err) {
+        assert(file.readFile(configExpected).trim(),
+               file.readFile(configOutput).trim());
+        done(err);
+      });
     });
-  });
+  }
+
+  compareConfig('alt-browser');
 
   it('bower-alt', function(done) {
     var configOutput = path.join(dir, 'output', 'bower-alt', 'config.js'),
@@ -58,4 +62,6 @@ describe('notobo', function() {
       done(err);
     });
   });
+
+  compareConfig('nested');
 });

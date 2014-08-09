@@ -4,28 +4,41 @@
 var fs = require('fs'),
     onrequirejs = require('./lib/onrequirejs');
 
-function setDepMap(normalizedId, deps, config) {
+function setDepMap(normalizedId, deps, map, config) {
+  var modConfig;
+
+  if (deps || map) {
+    modConfig = config.map[normalizedId] = {};
+  }
+
   if (deps) {
-    var modConfig = config.map[normalizedId] = {};
     Object.keys(deps).forEach(function(depKey) {
       var depValue = deps[depKey];
       modConfig[depKey] = depValue.normalizedId;
-      setDepMap(depValue.normalizedId, depValue.deps, config);
+      setDepMap(depValue.normalizedId, depValue.deps, depValue.map, config);
     });
   }
+
+  if (map) {
+    Object.keys(map).forEach(function(mapKey) {
+      var mapValue = map[mapKey];
+      modConfig[mapKey] = mapValue;
+    });
+  }
+
 }
 
 function setMap(obj, config) {
   var modified = false;
   Object.keys(obj).forEach(function(key) {
     var value = obj[key];
-    if (value.deps) {
+    if (value.deps || value.map) {
       if (!config.map) {
         config.map = {};
       }
 
       modified = true;
-      setDepMap(value.normalizedId, value.deps, config);
+      setDepMap(value.normalizedId, value.deps, value.map, config);
     }
   });
 

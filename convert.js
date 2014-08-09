@@ -18,7 +18,6 @@ var fs = require('fs'),
     jsSuffixRegExp = /\.js$/;
 
 //console.log(JSON.stringify(builtins, null, '  '));
-
 var streamMainAdapter = 'define([\'./stream/browser-main\'], ' +
                         'function(m) { return m; });';
 
@@ -224,7 +223,8 @@ function convertWithFile(baseUrl, options, file) {
   function convertPackage(walkData) {
     var fullPath = walkData.fullPath,
         packageName = walkData.packageName,
-        mainId = walkData.main;
+        mainId = walkData.main,
+        map = walkData.map;
 
     // If fullPath ends in a .js, rename the directory, and adjust the full
     // path.
@@ -254,6 +254,21 @@ function convertWithFile(baseUrl, options, file) {
                           '\'], function(m) { return m; });',
                          'utf8');
       }
+    }
+
+    // If any of the map property values is 'notobo-empty', write it out
+    // to the baseUrl area.
+    if (map) {
+      Object.keys(map).some(function(prop) {
+        if (map[prop] === 'notobo-empty') {
+          var targetPath = path.join(baseUrl, 'notobo-empty.js');
+          if (!fs.existsSync(targetPath)) {
+            file.copyFile(path.join(__dirname, 'adapters', 'notobo-empty.js'),
+                          targetPath);
+          }
+          return true;
+        }
+      });
     }
 
     // Scan for .js files, and convert to AMD.

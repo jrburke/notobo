@@ -68,12 +68,49 @@ function topPackage(packageName, fullPath, options, baseId) {
       normalizedId: normalizedId,
       fullPath: fullPath
     };
+    var nodeModulesPath = path.join(walkData.fullPath, 'node_modules');
+
 
     if (mainId) {
       // Normalize mainId -- do not need the ./ or the file extension
       walkData.main = mainId
                       .replace(firstDotRegExp, '')
                       .replace(jsSuffixRegExp, '');
+    }
+
+    // If the package.json has a browser field that is an object of alternatives
+    // set up map config for them.
+    var browserAlts = packageJson && packageJson.browser;
+    if (browserAlts && typeof browserAlts !== 'string') {
+        walkData.map = {};
+
+      Object.keys(browserAlts).forEach(function(targetId) {
+        var altId = browserAlts[targetId];
+
+        if (targetId.indexOf('.') === 0) {
+          targetId = walkData.normalizedId + '/' + targetId.substring(2);
+        }
+        targetId = targetId.replace(jsSuffixRegExp, '');
+
+        if (altId === false) {
+          walkData.map[targetId] = 'notobo-empty';
+        } else {
+          altId = altId.replace(jsSuffixRegExp, '');
+
+          if (altId.indexOf('.') === 0) {
+            altId = walkData.normalizedId + '/' + altId.substring(2);
+          } else {
+            // Find out if the referenced ID is in nested node_modules, and
+            // if so, append node_modules to the final ID.
+            var firstPart = altId.split('/').shift();
+            if (fs.existsSync(path.join(nodeModulesPath, firstPart))) {
+              altId = walkData.normalizedId + '/node_modules/' + altId;
+            }
+          }
+
+          walkData.map[targetId] = altId;
+        }
+      });
     }
 
     // Let callback know of new package dependency found. The callback has the
@@ -88,51 +125,16 @@ function topPackage(packageName, fullPath, options, baseId) {
     if (walkData.main) {
       result.main = walkData.main;
     }
+    if (walkData.map) {
+      result.map = walkData.map;
+    }
 
     // If the directory has a node_modules, recurse
-    var nodeModulesPath = path.join(walkData.fullPath, 'node_modules');
     if (fs.existsSync(nodeModulesPath) &&
         fs.statSync(nodeModulesPath).isDirectory()) {
       result.deps = walk(nodeModulesPath,
                                       options,
                                       walkData.normalizedId);
-    }
-
-    // If the package.json has a browser field that is an object of alternatives
-    // set up map config for them.
-    var browserAlts = packageJson && packageJson.browser;
-    if (browserAlts && typeof browserAlts !== 'string') {
-      if (!result.deps) {
-        result.deps = {};
-      }
-
-      Object.keys(browserAlts).forEach(function(targetId) {
-        var altId = browserAlts[targetId];
-
-        if (targetId.indexOf('.') === 0) {
-          targetId = walkData.normalizedId + '/' + targetId.substring(2);
-        }
-        targetId = targetId.replace(jsSuffixRegExp, '');
-
-        if (altId === false) {
-          result.deps[targetId] = 'notobo-empty';
-        } else {
-          altId = altId.replace(jsSuffixRegExp, '');
-
-          if (altId.indexOf('.') === 0) {
-            altId = walkData.normalizedId + altId.substring(2);
-          } else {
-            // Find out if the referenced ID is in nested node_modules, and
-            // if so, append node_modules to the final ID.
-            var firstPart = altId.split('/').shift();
-            if (fs.existsSync(path.join(nodeModulesPath, firstPart))) {
-              altId = walkData.normalizedId + '/node_modules/' + altId;
-            }
-          }
-
-          result.deps[targetId] = altId;
-        }
-      });
     }
   }
 
