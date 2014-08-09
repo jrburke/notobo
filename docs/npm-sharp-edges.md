@@ -1,10 +1,10 @@
 # npm sharp edges
 
-* default to install all at node_modules root unless a conflict
-* an npm flat instead of npm dedupe?
-* Problems exist for any module system that allows loading individual modules. Will happen ES modules, and if a CJS loader were to run.
-
 This is a list of sharp edges that come with using npm for front end code. If you know of existing bug numbers for some of these that are filed and in progress for npm, feel free to let me know and I can add links to them in the sections below.
+
+Note that these are not a result of using an AMD loader. The challenges here are around ID resolution, not module format.
+
+They result in any front end module loader that needs to have a single network IO lookup per module ID, and easy `baseUrl + moduleId + '.js'` convention to avoid big config blocks. The ES6 module loader would have these problems, and even a front end loader that allowed single module loads of CommonJS modules.
 
 ### Nested node_modules
 
@@ -12,7 +12,9 @@ npm favors nested node_modules to avoid version conflict issues. This is great f
 
 However, for front end code, the amount of code delivered over the wire is much more important, so trying to reduce the number of versions (or just duplicate copies of the same version) of a module is more important. Important enough that having an option to warn or block installs unless the developer makes a version choice can be useful.
 
-`npm dedupe` can help a bit, but I understand that it still needs some improvements before it can be relied upon. It seems like it also requires some regular gardening when doing `npm install` later.
+`npm dedupe` can help a bit, but I understand that it still needs some improvements before it can be relied upon. It seems like it also requires some regular gardening when doing `npm install` later. It also does not flatten the list of packages, so it still leads to more map config for a front end loader.
+
+What is likely wanted is something like a `npm flatten` command that will move all packages to the top-most node_modules directory, where possible. Or a package.json config option to specify "always flatten installs", and perhaps also warn/allow user to do manual version resolution to allow optimal flattening.
 
 ### Locked dependencies
 
