@@ -3,7 +3,7 @@
 
 ![notobo](http://jrburke.com/projects/notobo/notobo.png)
 
-Use modules installed via npm in AMD module projects, like projects that use [RequireJS](http://requirejs.org/). Experimental, still in 0.0.x release versions.
+Use npm-installed modules in AMD module projects, like projects that use [RequireJS](http://requirejs.org/). Experimental, still in 0.0.x release versions.
 
 ## Why
 
