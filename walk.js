@@ -105,6 +105,14 @@ function topPackage(packageName, fullPath, options, baseId) {
             var firstPart = altId.split('/').shift();
             if (fs.existsSync(path.join(nodeModulesPath, firstPart))) {
               altId = walkData.normalizedId + '/node_modules/' + altId;
+            } else {
+              // Try as a sibling
+              if (fs.existsSync(path.join(nodeModulesPath, '..', '..', firstPart))) {
+                var parts = walkData.normalizedId.split('/');
+                parts.pop();
+                parts.push(altId);
+                altId = parts.join('/');
+              }
             }
           }
 

@@ -31,8 +31,8 @@ describe('notobo', function() {
         baseUrl: path.join(dir, 'output', testName, 'node_modules'),
       },
       function(err) {
-        assert(file.readFile(configExpected).trim(),
-               file.readFile(configOutput).trim());
+        assert.equal(file.readFile(configExpected).trim(),
+                     file.readFile(configOutput).trim());
         done(err);
       });
     });
@@ -51,13 +51,13 @@ describe('notobo', function() {
       altMainJson: 'bower.json'
     },
     function(err) {
-      assert(file.readFile(configExpected).trim(),
-             file.readFile(configOutput).trim());
+      assert.equal(file.readFile(configExpected).trim(),
+                   file.readFile(configOutput).trim());
 
-      assert(true, !fs.existsSync(path.join(altLib, 'two.js')));
+      assert.equal(true, !fs.existsSync(path.join(altLib, 'two.js')));
       var adapterPath = path.join(altLib, 'one.js');
-      assert(true, fs.existsSync(adapterPath));
-      assert(true, file.readFile(adapterPath).indexOf('./one/main') !== -1);
+      assert.equal(true, fs.existsSync(adapterPath));
+      assert.equal(true, file.readFile(adapterPath).indexOf('./one/main') !== -1);
 
       done(err);
     });

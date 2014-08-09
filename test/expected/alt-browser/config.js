@@ -13,12 +13,16 @@ requirejs.config({
     },
     hastop: {
       'colors-browser': 'hastop/node_modules/colors-browser',
+      shirts: 'hastop/node_modules/shirts',
       colors: 'hastop/node_modules/colors-browser',
       'node-shapes': 'shapes'
     },
     'hastop/node_modules/colors-browser': {
       'hex-browser': 'hastop/node_modules/colors-browser/node_modules/hex-browser',
       hex: 'hastop/node_modules/colors-browser/node_modules/hex-browser'
+    },
+    'hastop/node_modules/shirts': {
+      colors: 'hastop/node_modules/colors-browser'
     }
   }
 });

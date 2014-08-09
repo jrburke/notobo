@@ -37,6 +37,13 @@
             "main": "index"
           }
         }
+      },
+      "shirts": {
+        "normalizedId": "hastop/node_modules/shirts",
+        "main": "index",
+        "map": {
+          "colors": "hastop/node_modules/colors-browser"
+        }
       }
     }
   },
