@@ -11,7 +11,7 @@ Some people want to use npm to pull in dependencies for front end code, and then
 
 It also illustrates the separation of package manager from module format concerns, and gives more options for people that want a module loader on the front end instead of just module bundling.
 
-For front end npm use, it also may give some feedback on how npm could be more usable for front end code.
+It also may also indicate some ways in which npm could more usable for front end code. See the [npm sharp edges doc](https://github.com/jrburke/notobo/blob/master/docs/npm-sharp-edges.md) for more info.
 
 ## How it works
 
