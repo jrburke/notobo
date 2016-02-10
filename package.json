@@ -1,6 +1,6 @@
 {
   "name": "notobo",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Use modules installed via npm in an AMD module project",
   "main": "index.js",
   "bin": {
@@ -27,8 +27,8 @@
     "mocha": "~1.20.1"
   },
   "dependencies": {
-    "browserify": "^5.9.1",
-    "esprima": "~1.2.2",
-    "requirejs": "~2.1.14"
+    "browserify": "^13.0.0",
+    "esprima": "~2.7.2",
+    "requirejs": "~2.1.22"
   }
 }
